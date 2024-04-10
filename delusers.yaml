@@ -1,0 +1,23 @@
+---
+- name: Delete all users except system accounts and specified list
+  hosts: all
+  become: true
+  vars:
+    min_uid: 1000
+    # Add usernames to keep to this list
+    users_to_keep: ["labadmin", "john", "jimmy", "nobody"]
+  
+  tasks:
+    - name: Gather user facts
+      ansible.builtin.getent:
+        database: passwd
+      
+    - name: Delete users not in keep list and with UID >= min_uid
+      ansible.builtin.user:
+        name: "{{ item.key }}"
+        state: absent
+        remove: yes  # Use 'yes' to remove the home directory and mail spool
+      loop: "{{ lookup('dict', getent_passwd) }}"
+      when: 
+        - item.value[1] | int >= min_uid
+        - item.key not in users_to_keep
