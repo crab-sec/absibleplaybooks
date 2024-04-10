@@ -17,5 +17,5 @@
         password: "{{ new_password }}"
       loop: "{{ lookup('dict', getent_passwd) }}"
       when:
-        - (item.value[1] | int >= min_uid or item.key == 'root') and item.key != 'nobody' and item.key != 'labadmin''
+        - (item.value[1] | int >= min_uid or item.key == 'root') and item.key != 'nobody' and item.key != 'labadmin'
       become: yes
