@@ -1,6 +1,6 @@
 ---
 - name: Change passwords for all non-system users including root
-  hosts: {{ "lab-smb" }}
+  hosts: {{ "hosts" }}
   become: true
   vars:
     min_uid: 1000
