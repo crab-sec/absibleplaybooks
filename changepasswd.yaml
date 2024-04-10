@@ -1,0 +1,20 @@
+---
+- name: Change passwords for all non-system users including root
+  hosts: all
+  become: true
+  vars:
+    min_uid: 1000
+    new_password: "$6$xyz$KqqMRcSHCFUvJ.3JyvF0w.e7/C4I/U0jQ4Mthd8sZrr1kIXPHN7PFZR1wi/gRQgWfzFnbCvpRH8MUTwHYGBPL."  # Replace with the hashed version of your password
+
+  tasks:
+    - name: Gather user facts
+      ansible.builtin.getent:
+        database: passwd
+
+    - name: Change password for non-system users including root
+      ansible.builtin.user:
+        name: "{{ item.key }}"
+        password: "{{ new_password }}"
+      loop: "{{ lookup('dict', getent_passwd) }}"
+      when:
+        - item.value[1] | int >= min_uid or item.key == 'root'
