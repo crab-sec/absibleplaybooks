@@ -1,6 +1,6 @@
 ---
 - name: Delete all users except system accounts and specified list
-  hosts: all
+  hosts: "{{ host }}"
   become: true
   vars:
     min_uid: 1000
