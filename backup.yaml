@@ -1,0 +1,43 @@
+---
+- name: Backup /etc/ directory to a remote location, organized by hostname
+  hosts: your_target_hosts
+  become: true
+  vars:
+    backup_share: "//10.105.1.70/backups"
+    mount_point: "/mnt/backups"
+    cifs_username: "yourUsername"
+    cifs_password: "yourPassword"
+    cifs_domain: "yourDomain"  # Optional, remove or adjust if not needed
+
+  tasks:
+    - name: Install cifs-utils package
+      ansible.builtin.package:
+        name: cifs-utils
+        state: present
+
+    - name: Create the mount point
+      ansible.builtin.file:
+        path: "{{ mount_point }}"
+        state: directory
+
+    - name: Mount the backup share
+      ansible.builtin.mount:
+        path: "{{ mount_point }}"
+        src: "{{ backup_share }}"
+        fstype: cifs
+        opts: "username={{ cifs_username }},password={{ cifs_password }},domain={{ cifs_domain }}"
+        state: mounted
+
+    - name: Ensure the host-specific backup directory exists
+      ansible.builtin.file:
+        path: "{{ mount_point }}/{{ ansible_hostname }}"
+        state: directory
+
+    - name: Synchronize /etc/ to the host-specific backup directory
+      ansible.builtin.synchronize:
+        src: /etc/
+        dest: "{{ mount_point }}/{{ ansible_hostname }}/etc_backup/"
+        rsync_opts:
+          - "--no-owner"
+          - "--no-group"
+      delegate_to: "{{ inventory_hostname }}"
