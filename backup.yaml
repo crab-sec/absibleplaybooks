@@ -2,12 +2,6 @@
 - name: Backup /etc/ directory to a remote location, organized by hostname
   hosts: your_target_hosts
   become: true
-  vars:
-    backup_share: "//10.105.1.70/backups"
-    mount_point: "/mnt/backups"
-    cifs_username: "yourUsername"
-    cifs_password: "yourPassword"
-    cifs_domain: "yourDomain"  # Optional, remove or adjust if not needed
 
   tasks:
     - name: Install cifs-utils package
