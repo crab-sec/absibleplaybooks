@@ -17,12 +17,17 @@
       lineinfile:
         path: /etc/sudoers
         state: present
-        regexp: '^{{ user }} ALL=\(ALL\) NOPASSWD: /usr/bin/rsync'
+        regexp: '^%{{ user }} ALL=\(ALL\) NOPASSWD: /usr/bin/rsync'
         line: '{{ user }} ALL=(ALL) NOPASSWD: /usr/bin/rsync'
         validate: 'visudo -cf %s'
 
-    - name: Copy /etc to /backups/etc using rsync via command
-      command:
-        cmd: "rsync -a --exclude '/etc/hostname' --exclude '/etc/hosts' /etc/ /backups/etc/"
-      args:
-        creates: "/backups/etc"
+    - name: Synchronize /etc to /backups/etc
+      become: yes
+      synchronize:
+        src: "{{ source_path }}"
+        dest: "{{ backup_path }}"
+        recursive: yes
+        delete: no  # Set to 'yes' if you want to delete extraneous files from dest that are not in src
+        rsync_opts:
+          - "--exclude=/etc/hostname"
+          - "--exclude=/etc/hosts"
