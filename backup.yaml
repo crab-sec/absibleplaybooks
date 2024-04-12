@@ -11,7 +11,7 @@
         owner: root
         group: root
         mode: '0755'
-    become: yes
+  become: yes
 
     - name: Add rsync to sudoers for password-less execution
       lineinfile:
