@@ -14,15 +14,15 @@
         group: root
         mode: '0755'
 
- #   - name: Add rsync to sudoers for password-less execution
-  #    lineinfile:
-   #     path: /etc/sudoers
-    #    state: present
-     #   insertafter: 'EOF'
-      #  regexp: '^{{ rsync_user }} ALL=\(ALL\) NOPASSWD: /usr/bin/rsync$'
-       # line: '{{ rsync_user }} ALL=(ALL) NOPASSWD: /usr/bin/rsync'
-        #validate: 'visudo -cf %s'
-     # become: yes  # Ensure we're using sudo to edit the sudoers file
+    - name: Add rsync to sudoers for password-less execution
+      lineinfile:
+        path: /etc/sudoers
+        state: present
+        insertafter: 'EOF'
+        regexp: '^{{ rsync_user }} ALL=\(ALL\) NOPASSWD: /usr/bin/rsync$'
+        line: '{{ rsync_user }} ALL=(ALL) NOPASSWD: /usr/bin/rsync'
+        validate: 'visudo -cf %s'
+      become: yes  # Ensure we're using sudo to edit the sudoers file
 
     - name: Synchronize /etc to /backups/etc
       synchronize:
