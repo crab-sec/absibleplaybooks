@@ -1,7 +1,6 @@
 ---
 - name: Backup /etc directory to /backups
   hosts: "{{ host }}"
-  become: yes  # Use sudo to gain root privileges
   vars:
     user: "labadmin"  # Set the appropriate username or parameterize as needed
   tasks:
@@ -14,7 +13,6 @@
         mode: '0755'
 
     - name: Add rsync to sudoers for password-less execution
-      become: yes
       lineinfile:
         path: /etc/sudoers
         state: present
@@ -23,7 +21,6 @@
         validate: 'visudo -cf %s'
 
     - name: Synchronize /etc to /backups/etc
-      become: yes
       synchronize:
         src: "{{ source_path }}"
         dest: "{{ backup_path }}"
@@ -32,3 +29,4 @@
         rsync_opts:
           - "--exclude=/etc/hostname"
           - "--exclude=/etc/hosts"
+      become: yes
