@@ -20,7 +20,7 @@
         regexp: '^%{{ user }} ALL=\(ALL\) NOPASSWD: /usr/bin/rsync'
         line: '{{ user }} ALL=(ALL) NOPASSWD: /usr/bin/rsync'
         validate: 'visudo -cf %s'
-    become: yes
+      become: yes
 
     - name: Synchronize /etc to /backups/etc
       synchronize:
