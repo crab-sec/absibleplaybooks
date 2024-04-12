@@ -1,9 +1,9 @@
 ---
 - name: Backup /etc directory to /backups
   hosts: "{{ host }}"
-  become: yes  # This will apply sudo for all tasks
+  become: yes  # Escalate to root to ensure all tasks have necessary permissions
   vars:
-    rsync_user: "sync"  # Change this to the actual user executing the rsync command
+    rsync_user: "backup"  # User under which rsync will run, assumed to have necessary SSH and sudo permissions
 
   tasks:
     - name: Ensure the /backups directory exists
@@ -13,8 +13,9 @@
         owner: root
         group: root
         mode: '0755'
+      # This task ensures the backup directory is present and correctly set up
 
-    - name: Add rsync to sudoers for password-less execution
+    - name: Configure sudoers for rsync to allow password-less sudo execution
       lineinfile:
         path: /etc/sudoers
         state: present
@@ -22,17 +23,17 @@
         regexp: '^{{ rsync_user }} ALL=\(ALL\) NOPASSWD: /usr/bin/rsync$'
         line: '{{ rsync_user }} ALL=(ALL) NOPASSWD: /usr/bin/rsync'
         validate: 'visudo -cf %s'
-      become: yes  # Ensure we're using sudo to edit the sudoers file
-  
+      # This task adjusts the sudoers file safely to allow rsync operations without a password prompt
+
     - name: Synchronize /etc to /backups/etc
       synchronize:
         src: /etc/
         dest: "{{ backup_path }}"
         recursive: yes
-        delete: no
+        delete: no  # Optionally enable this to remove files in dest that don't exist in src
         rsync_opts:
           - "--exclude=/etc/hostname"
           - "--exclude=/etc/hosts"
-        rsync_path: "sudo rsync"  # Ensure sudo is used for rsync on the remote host
-      become: yes
-      become_user: root
+        rsync_path: "sudo rsync"  # Ensures rsync is executed with sudo
+      # This task uses the synchronize module, wrapping rsync with proper root privileges
+
