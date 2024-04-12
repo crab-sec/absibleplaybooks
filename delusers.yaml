@@ -12,7 +12,7 @@
       ansible.builtin.getent:
         database: passwd
       
-    - name: Delete users not in keep list and with UID >= min_uid
+    - name: Delete users not in keep list and with UID greater or less than min_uid
       ansible.builtin.user:
         name: "{{ item.key }}"
         state: absent
