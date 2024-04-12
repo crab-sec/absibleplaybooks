@@ -23,16 +23,16 @@
         line: '{{ rsync_user }} ALL=(ALL) NOPASSWD: /usr/bin/rsync'
         validate: 'visudo -cf %s'
       become: yes  # Ensure we're using sudo to edit the sudoers file
-
-  - name: Synchronize /etc to /backups/etc
-    synchronize:
-      src: /etc/
-      dest: "{{ backup_path }}"
-      recursive: yes
-      delete: no
-      rsync_opts:
-        - "--exclude=/etc/hostname"
-        - "--exclude=/etc/hosts"
-      rsync_path: "sudo rsync"  # Ensure sudo is used for rsync on the remote host
-    become: yes
-    become_user: root
+  
+    - name: Synchronize /etc to /backups/etc
+      synchronize:
+        src: /etc/
+        dest: "{{ backup_path }}"
+        recursive: yes
+        delete: no
+        rsync_opts:
+          - "--exclude=/etc/hostname"
+          - "--exclude=/etc/hosts"
+        rsync_path: "sudo rsync"  # Ensure sudo is used for rsync on the remote host
+      become: yes
+      become_user: root
