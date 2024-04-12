@@ -14,7 +14,7 @@
     - name: Synchronize /etc to /backups/etc
       synchronize:
         src: "{{ source_path }}"
-        dest: "{{ backup_path }}
+        dest: "{{ backup_path }}"
         recursive: yes
         delete: no  # Set to 'yes' if you want to delete extraneous files from dest that are not in src
     rsync_opts:
