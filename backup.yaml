@@ -12,6 +12,7 @@
         mode: '0755'
 
     - name: Synchronize /etc to /backups/etc
+      become: yes
       synchronize:
         src: "{{ source_path }}"
         dest: "{{ backup_path }}"
