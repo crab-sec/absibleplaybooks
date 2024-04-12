@@ -1,37 +1,22 @@
 ---
-- name: Backup /etc/ directory to a remote location, organized by hostname
-  hosts: your_target_hosts
-  become: true
-
+- name: Backup  directory to /backups
+  hosts: "{{ host }}"
+  become: yes  # Use sudo to gain root privileges
   tasks:
-    - name: Install cifs-utils package
-      ansible.builtin.package:
-        name: cifs-utils
-        state: present
-
-    - name: Create the mount point
-      ansible.builtin.file:
-        path: "{{ mount_point }}"
+    - name: Ensure the /backups directory exists
+      file:
+        path: "{{ backup }}"
         state: directory
+        owner: root
+        group: root
+        mode: '0755'
 
-    - name: Mount the backup share
-      ansible.builtin.mount:
-        path: "{{ mount_point }}"
-        src: "{{ backup_share }}"
-        fstype: cifs
-        opts: "username={{ cifs_username }},password={{ cifs_password }},domain={{ cifs_domain }}"
-        state: mounted
-
-    - name: Ensure the host-specific backup directory exists
-      ansible.builtin.file:
-        path: "{{ mount_point }}/{{ ansible_hostname }}"
-        state: directory
-
-    - name: Synchronize /etc/ to the host-specific backup directory
-      ansible.builtin.synchronize:
-        src: /etc/
-        dest: "{{ mount_point }}/{{ ansible_hostname }}/etc_backup/"
+    - name: Synchronize /etc to /backups/etc
+      synchronize:
+        src: "{{ source_path }}"
+        dest: "{{ backup_path }}
+        recursive: yes
+        delete: no  # Set to 'yes' if you want to delete extraneous files from dest that are not in src
         rsync_opts:
-          - "--no-owner"
-          - "--no-group"
-      delegate_to: "{{ inventory_hostname }}"
+          - "--exclude=/etc/hostname"
+          - "--exclude=/etc/hosts"
