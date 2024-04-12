@@ -5,7 +5,7 @@
   vars:
     min_uid: 1000
     # Add usernames to keep to this list
-    users_to_keep: "{{ kept_users }}"
+    users_to_keep: "{{ users_to_keep }}"
   
   tasks:
     - name: Gather user facts
