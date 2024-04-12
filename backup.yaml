@@ -1,33 +1,26 @@
 ---
-- name: Backup /etc directory to /backups
-  hosts: "{{ host }}"
-  become: yes  # Use sudo to gain root privileges
-  vars:
-    user: "your_username"  # Set the appropriate username or parameterize as needed
+- name: Synchronize entire directory from {{ host }} to local /tmp directory on Ansible control machine
+  hosts: '{{ host }}'
+  become: yes
   tasks:
-    - name: Ensure the /backups directory exists
-      file:
-        path: "{{ backup_path }}"
-        state: directory
+    - name: Synchronize the directory to local
+      synchronize:
+        src: '{{ source_path }}'
+        dest: '/tmp/{{ backup_folder }}'
+        mode: pull
+        recursive: yes
+
+- name: Synchronize directory from Ansible control machine to {{ backup_server }}
+  hosts: '{{ backup_server }}'
+  become: yes
+  tasks:
+    - name: Synchronize the directory to remote
+      synchronize:
+        src: '/tmp/{{ backup_folder }}/'
+        dest: '{{ backup_path }}'
+        mode: push
+        recursive: yes
+        delete: yes  # Optionally add this to ensure the destination matches the source exactly
         owner: root
         group: root
-        mode: '0755'
-
-    - name: Add rsync to sudoers for password-less execution
-      lineinfile:
-        path: /etc/sudoers
-        state: present
-        regexp: '^%{{ user }} ALL=\(ALL\) NOPASSWD: /usr/bin/rsync'
-        line: '{{ user }} ALL=(ALL) NOPASSWD: /usr/bin/rsync'
-        validate: 'visudo -cf %s'
-
-    - name: Synchronize /etc to /backups/etc
-      become: yes
-      synchronize:
-        src: "{{ source_path }}"
-        dest: "{{ backup_path }}"
-        recursive: yes
-        delete: no  # Set to 'yes' if you want to delete extraneous files from dest that are not in src
-        rsync_opts:
-          - "--exclude=/etc/hostname"
-          - "--exclude=/etc/hosts"
+        perms: yes  # Ensure permissions are set according to source
