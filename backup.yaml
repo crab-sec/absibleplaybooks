@@ -2,7 +2,7 @@
 - name: Backup /etc directory to /backups
   hosts: "{{ host }}"
   vars:
-    user: "labadmin"  # Set the appropriate username or parameterize as needed
+    user: "rsync"  # Set the appropriate username or parameterize as needed
   tasks:
     - name: Ensure the /backups directory exists
       file:
