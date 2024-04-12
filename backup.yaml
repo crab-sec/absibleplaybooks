@@ -17,6 +17,6 @@
         dest: "{{ backup_path }}
         recursive: yes
         delete: no  # Set to 'yes' if you want to delete extraneous files from dest that are not in src
-        rsync_opts:
-          - "--exclude=/etc/hostname"
-          - "--exclude=/etc/hosts"
+    rsync_opts:
+      - "--exclude=/etc/hostname"
+      - "--exclude=/etc/hosts"
