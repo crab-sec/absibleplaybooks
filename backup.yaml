@@ -14,6 +14,7 @@
         mode: '0755'
 
     - name: Add rsync to sudoers for password-less execution
+      become: yes
       lineinfile:
         path: /etc/sudoers
         state: present
