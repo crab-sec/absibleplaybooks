@@ -3,7 +3,7 @@
   hosts: "{{ host }}"
   become: yes  # This will apply sudo for all tasks
   vars:
-    rsync_user: "labadmin"  # Change this to the actual user executing the rsync command
+    rsync_user: "sync"  # Change this to the actual user executing the rsync command
 
   tasks:
     - name: Ensure the /backups directory exists
